@@ -3,38 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resultados Profissionais</title>
+  <title>Sandra Tricoterapeuta | Resultados Profissionais</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background: #111;
-      color: #fff;
+      background: #0d1117;
+      color: #e6edf3;
     }
 
     header {
       text-align: center;
-      padding: 2rem;
-      background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+      padding: 3rem 1rem;
+      background: linear-gradient(135deg, #00bcd4, #0077b6);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     header h1 {
       margin: 0;
-      font-size: 2.5rem;
+      font-size: 2.8rem;
+      letter-spacing: 1px;
+    }
+
+    header h2 {
+      margin-top: 1rem;
+      font-size: 1.4rem;
+      font-weight: normal;
     }
 
     main {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: auto;
       padding: 2rem;
     }
 
     form {
-      background: #1e1e1e;
+      background: #161b22;
       padding: 2rem;
-      border-radius: 12px;
+      border-radius: 16px;
       margin-bottom: 3rem;
+      box-shadow: 0 0 15px rgba(0, 188, 212, 0.2);
     }
 
     input, textarea, button {
@@ -43,31 +53,43 @@
       padding: 1rem;
       font-size: 1rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
     }
 
     input, textarea {
-      background: #2a2a2a;
+      background: #0d1117;
       color: #fff;
+      border: 1px solid #30363d;
     }
 
     button {
-      background: #00bcd4;
-      color: #000;
+      background: linear-gradient(90deg, #00bcd4, #00acc1);
+      color: #fff;
       font-weight: bold;
-      cursor: pointer;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      background: linear-gradient(90deg, #00acc1, #00bcd4);
     }
 
     .gallery {
       display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 2rem;
     }
 
     .card {
-      background: #1a1a1a;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,255,255,0.1);
+      background: #161b22;
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 188, 212, 0.15);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
     }
 
     .before-after {
@@ -78,12 +100,19 @@
 
     .before-after img {
       width: 48%;
-      border-radius: 8px;
+      border-radius: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    .before-after img:hover {
+      transform: scale(1.05);
     }
 
     .card p {
       margin-top: 1rem;
-      color: #ccc;
+      color: #c9d1d9;
+      font-size: 1rem;
+      line-height: 1.5;
     }
 
     @media (max-width: 600px) {
@@ -95,13 +124,14 @@
 </head>
 <body>
   <header>
-    <h1>Resultados Antes e Depois</h1>
+    <h1>Sandra Tricoterapeuta</h1>
+    <h2>Especialista em cuidados capilares e estética</h2>
   </header>
   <main>
     <form id="uploadForm">
       <input type="file" id="beforeImage" accept="image/*" required />
       <input type="file" id="afterImage" accept="image/*" required />
-      <textarea id="descriptionInput" placeholder="Descreva o resultado..." required></textarea>
+      <textarea id="descriptionInput" placeholder="Descreva o resultado (ex: Queda de cabelo, Mega hair, Recuperação de fios)..." required></textarea>
       <button type="submit">Adicionar Resultado</button>
     </form>
 
@@ -114,6 +144,9 @@
     const afterImage = document.getElementById('afterImage');
     const descriptionInput = document.getElementById('descriptionInput');
     const gallery = document.getElementById('gallery');
+
+    const savedCards = JSON.parse(localStorage.getItem('cards') || '[]');
+    savedCards.forEach((cardData) => renderCard(cardData));
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -132,29 +165,16 @@
 
       beforeReader.onload = function (beforeEvent) {
         afterReader.onload = function (afterEvent) {
-          const card = document.createElement('div');
-          card.className = 'card';
+          const cardData = {
+            beforeSrc: beforeEvent.target.result,
+            afterSrc: afterEvent.target.result,
+            description
+          };
 
-          const images = document.createElement('div');
-          images.className = 'before-after';
+          renderCard(cardData);
 
-          const beforeImg = document.createElement('img');
-          beforeImg.src = beforeEvent.target.result;
-          beforeImg.alt = 'Antes';
-
-          const afterImg = document.createElement('img');
-          afterImg.src = afterEvent.target.result;
-          afterImg.alt = 'Depois';
-
-          images.appendChild(beforeImg);
-          images.appendChild(afterImg);
-
-          const desc = document.createElement('p');
-          desc.textContent = description;
-
-          card.appendChild(images);
-          card.appendChild(desc);
-          gallery.prepend(card);
+          savedCards.unshift(cardData);
+          localStorage.setItem('cards', JSON.stringify(savedCards));
 
           form.reset();
         };
@@ -163,9 +183,33 @@
 
       beforeReader.readAsDataURL(beforeFile);
     });
+
+    function renderCard({ beforeSrc, afterSrc, description }) {
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const images = document.createElement('div');
+      images.className = 'before-after';
+
+      const beforeImg = document.createElement('img');
+      beforeImg.src = beforeSrc;
+      beforeImg.alt = 'Antes';
+
+      const afterImg = document.createElement('img');
+      afterImg.src = afterSrc;
+      afterImg.alt = 'Depois';
+
+      images.appendChild(beforeImg);
+      images.appendChild(afterImg);
+
+      const desc = document.createElement('p');
+      desc.textContent = description;
+
+      card.appendChild(images);
+      card.appendChild(desc);
+      gallery.prepend(card);
+    }
   </script>
 </body>
 </html>
-
-
 
