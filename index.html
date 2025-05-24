@@ -76,8 +76,12 @@
       transform: scale(1.03);
       box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
     }
-    .card img {
-      width: 100%;
+    .before-after {
+      display: flex;
+      gap: 1rem;
+    }
+    .before-after img {
+      width: 50%;
       border-radius: 8px;
     }
     .card p {
@@ -86,8 +90,11 @@
       color: #ccc;
     }
     @media (max-width: 600px) {
-      header h1 {
-        font-size: 2rem;
+      .before-after {
+        flex-direction: column;
+      }
+      .before-after img {
+        width: 100%;
       }
     }
   </style>
@@ -98,7 +105,8 @@
   </header>
   <main>
     <form id="uploadForm">
-      <input type="file" id="imageInput" accept="image/*" required />
+      <input type="file" id="beforeImage" accept="image/*" required />
+      <input type="file" id="afterImage" accept="image/*" required />
       <textarea id="descriptionInput" placeholder="Descrição do resultado..." required></textarea>
       <button type="submit">Publicar Resultado</button>
     </form>
@@ -108,39 +116,56 @@
 
   <script>
     const form = document.getElementById('uploadForm');
-    const imageInput = document.getElementById('imageInput');
+    const beforeImage = document.getElementById('beforeImage');
+    const afterImage = document.getElementById('afterImage');
     const descriptionInput = document.getElementById('descriptionInput');
     const gallery = document.getElementById('gallery');
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      const file = imageInput.files[0];
+      const beforeFile = beforeImage.files[0];
+      const afterFile = afterImage.files[0];
       const description = descriptionInput.value;
 
-      if (!file || !description) {
-        alert('Por favor, adicione uma imagem e uma descrição.');
+      if (!beforeFile || !afterFile || !description) {
+        alert('Por favor, envie as duas imagens e a descrição.');
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const card = document.createElement('div');
-        card.className = 'card';
+      const beforeReader = new FileReader();
+      const afterReader = new FileReader();
 
-        const img = document.createElement('img');
-        img.src = event.target.result;
+      beforeReader.onload = function (beforeEvent) {
+        afterReader.onload = function (afterEvent) {
+          const card = document.createElement('div');
+          card.className = 'card';
 
-        const desc = document.createElement('p');
-        desc.textContent = description;
+          const container = document.createElement('div');
+          container.className = 'before-after';
 
-        card.appendChild(img);
-        card.appendChild(desc);
-        gallery.prepend(card);
+          const beforeImg = document.createElement('img');
+          beforeImg.src = beforeEvent.target.result;
+          beforeImg.alt = 'Antes';
 
-        form.reset();
+          const afterImg = document.createElement('img');
+          afterImg.src = afterEvent.target.result;
+          afterImg.alt = 'Depois';
+
+          container.appendChild(beforeImg);
+          container.appendChild(afterImg);
+
+          const desc = document.createElement('p');
+          desc.textContent = description;
+
+          card.appendChild(container);
+          card.appendChild(desc);
+          gallery.prepend(card);
+
+          form.reset();
+        };
+        afterReader.readAsDataURL(afterFile);
       };
-
-      reader.readAsDataURL(file);
+      beforeReader.readAsDataURL(beforeFile);
     });
   </script>
 </body>
