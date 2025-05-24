@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meus Resultados</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      max-width: 600px;
+      margin: 0 auto 40px;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 1em;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .card img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .card p {
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Meus Resultados</h1>
+  <form id="uploadForm">
+    <input type="file" id="imageInput" accept="image/*" required />
+    <textarea id="descriptionInput" placeholder="Descrição..." required></textarea>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <div class="gallery" id="gallery"></div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const imageInput = document.getElementById('imageInput');
+    const descriptionInput = document.getElementById('descriptionInput');
+    const gallery = document.getElementById('gallery');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const file = imageInput.files[0];
+      const description = descriptionInput.value;
+
+      if (!file || !description) {
+        alert('Por favor, adicione uma imagem e uma descrição.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const img = document.createElement('img');
+        img.src = event.target.result;
+
+        const desc = document.createElement('p');
+        desc.textContent = description;
+
+        card.appendChild(img);
+        card.appendChild(desc);
+        gallery.appendChild(card);
+
+        form.reset();
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
